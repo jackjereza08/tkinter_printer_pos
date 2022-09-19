@@ -3,24 +3,37 @@ import mysql.connector as connector
 from mysql.connector import Error
 
 
-class Main:
+class Main_Script:
     def __init__(self):
         try:
-            conn = connector.connect(
-                    host='localhost',
-                    user= input("Username:"),
-                    passwd=getpass("Password:"))
-
-            cursor = conn.cursor()
-            create_database = "CREATE DATABASE db_print_pos"
-            cursor.execute(create_database)
-
-            print(conn)
-            print(cursor.execute("SHOW DATABASES"))
-
+            conn = self.db_connect()
+            query = "SELECT * from tbl_paper"
+            result = self.execute_query(conn, query).fetchall()
+            for x in result:
+                print(x)
             conn.close()
         except Error as e:
             print(e)
 
-Main()
+    def db_connect(self):
+        conn = connector.connect(
+            host='localhost',
+            user= 'root',
+            passwd='root',
+            database='db_print_pos')      
+        return conn
 
+    def execute_query(self, conn, query):
+        cursor = conn.cursor()
+        cursor.execute(query)
+        return cursor
+
+
+    def display_paper_type(self):
+        try:
+            db_connect()
+            self.cursor.execute()
+        except Error as e:
+            print(e)
+
+Main_Script()
