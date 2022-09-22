@@ -4,8 +4,9 @@ from mysql.connector import Error
 
 
 class Main_Script:
-    def __init__(self):
-        self.display_paper_type()
+    # def __init__(self):
+    #     pass
+        # self.display_paper_type()
 
     def db_connect(self):
         conn = connector.connect(
@@ -35,4 +36,16 @@ class Main_Script:
         except Error as e:
             print(e)
 
-Main_Script()
+
+    def show_available_no_paper(self, paper_index):
+        try:
+            conn = self.db_connect()
+            query = f"SELECT beg_no_pages from tbl_inventory WHERE id_paper = {paper_index+1}"
+            result = self.execute_query(conn, query).fetchone()
+            conn.close()
+
+            return result
+            # print(result)
+        except Error as e:
+            print(e)
+

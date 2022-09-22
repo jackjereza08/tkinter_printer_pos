@@ -2,20 +2,25 @@
 from tkinter import *
 from tkinter import font
 from tkinter.ttk import *
-import main_script
+from main_script import Main_Script
 
 
 FONT_STYLE = ("", 12)
 FONT_STYLE_ENTRY = ("", 14)
+DB_CONNECTION = Main_Script()
 
 class Main:
     def __init__(self):
-        root = Tk()
+        self.root = Tk()
+        self.init_variables()
         self.configure()
-        self.column0(root)
-        self.column1(root)
-        self.column2(root)
-        root.mainloop()
+        self.column0()
+        self.column1()
+        self.column2()
+        self.root.mainloop()
+
+    def init_variables(self):
+        self.paper_type_index_var = StringVar()
 
     def configure(self):
         style = Style()
@@ -24,22 +29,20 @@ class Main:
         style.configure('MyCB.TCombobox', font=FONT_STYLE)
         style.configure('MyBTN.TButton', font=FONT_STYLE, background='#00FF22')
 
-    def column0(self,root):
-        frame_column0 = Frame(root)
+    def column0(self):
+        frame_column0 = Frame(self.root)
         frame_column0.grid(row=0, column=0)
 
-        def paper_selection(event):
-            # print(f"Selected: {cmb_paper_type.get()}")
-            print(cmb_paper_type.current())
+        def combobox_selected(event):
+            self.paper_selection(cmb_paper_type.current())
         
         div = Frame(frame_column0)
         lbl_paper_type = Label(div,text="Paper Type", font=FONT_STYLE)
         paper_type_var = StringVar()
         cmb_paper_type = Combobox(div, textvariable=paper_type_var, style='MyCB.TCombobox')
-        paper_type = main_script.Main_Script()
-        cmb_paper_type['values'] = paper_type.display_paper_type()
+        cmb_paper_type['values'] = DB_CONNECTION.display_paper_type()
         cmb_paper_type.state(['readonly'])
-        cmb_paper_type.bind('<<ComboboxSelected>>', paper_selection)
+        cmb_paper_type.bind('<<ComboboxSelected>>', combobox_selected)
 
         div.grid(row=0, column=0, sticky=W, padx=10, pady=10)
         lbl_paper_type.grid(sticky=W)
@@ -66,12 +69,14 @@ class Main:
         tb_pages_printed.grid(sticky=W, pady=10)
 
 
-    def column1(self, root):
-        frame_column1 = Frame(root)
+    def column1(self):
+        frame_column1 = Frame(self.root)
         frame_column1.grid(row=0, column=1, rowspan=3, sticky=NW, padx=10, pady=10)
 
         lbl_available = Label(frame_column1, text="Available Paper", font=FONT_STYLE)
         lbl_available_no = Label(frame_column1, text="0", font=FONT_STYLE)
+        lbl_available_no['textvariable'] = self.paper_type_index_var
+        self.paper_type_index_var.set("0")
         lbl_price = Label(frame_column1, text="Price", font=FONT_STYLE)
         lbl_price_no = Label(frame_column1, text="Php 0.00 per pages", font=FONT_STYLE)
         
@@ -81,8 +86,8 @@ class Main:
         lbl_price_no.pack(anchor=W)
 
     
-    def column2(self, root):
-        frame_column2 = Frame(root)
+    def column2(self):
+        frame_column2 = Frame(self.root)
         frame_column2.grid(row=0, column=2, padx=10, pady=10, sticky=NSEW)
 
         div = Frame(frame_column2)
@@ -121,6 +126,11 @@ class Main:
 
         btn_save_transaction = Button(div, text="Save Transaction", style='MyBTN.TButton')
         btn_save_transaction.grid(row=3, columnspan=3, sticky=NSEW)
+
+
+    def paper_selection(self, index):
+        result = DB_CONNECTION.show_available_no_paper(index)
+        self.paper_type_index_var.set(str(result[0]))
 
 
 Main()
