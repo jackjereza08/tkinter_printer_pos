@@ -5,15 +5,7 @@ from mysql.connector import Error
 
 class Main_Script:
     def __init__(self):
-        try:
-            conn = self.db_connect()
-            query = "SELECT * from tbl_paper"
-            result = self.execute_query(conn, query).fetchall()
-            for x in result:
-                print(x)
-            conn.close()
-        except Error as e:
-            print(e)
+        self.display_paper_type()
 
     def db_connect(self):
         conn = connector.connect(
@@ -31,8 +23,15 @@ class Main_Script:
 
     def display_paper_type(self):
         try:
-            db_connect()
-            self.cursor.execute()
+            conn = self.db_connect()
+            query = "SELECT * from tbl_paper"
+            result = self.execute_query(conn, query).fetchall()
+            paper_list = []
+            for rows in result:
+                paper_list.append(rows[1]+" ("+rows[2]+")")
+            conn.close()
+
+            return paper_list
         except Error as e:
             print(e)
 
