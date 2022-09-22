@@ -2,6 +2,7 @@
 from tkinter import *
 from tkinter import font
 from tkinter.ttk import *
+import main_script
 
 
 FONT_STYLE = ("", 12)
@@ -28,13 +29,15 @@ class Main:
         frame_column0.grid(row=0, column=0)
 
         def paper_selection(event):
-            print(f"Selected: {cmb_paper_type.get()}")
+            # print(f"Selected: {cmb_paper_type.get()}")
+            print(cmb_paper_type.current())
         
         div = Frame(frame_column0)
         lbl_paper_type = Label(div,text="Paper Type", font=FONT_STYLE)
         paper_type_var = StringVar()
         cmb_paper_type = Combobox(div, textvariable=paper_type_var, style='MyCB.TCombobox')
-        cmb_paper_type['values'] = ('Short', 'Long', 'A4')
+        paper_type = main_script.Main_Script()
+        cmb_paper_type['values'] = paper_type.display_paper_type()
         cmb_paper_type.state(['readonly'])
         cmb_paper_type.bind('<<ComboboxSelected>>', paper_selection)
 
