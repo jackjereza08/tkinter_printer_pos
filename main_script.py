@@ -3,11 +3,7 @@ import mysql.connector as connector
 from mysql.connector import Error
 
 
-class Main_Script:
-    # def __init__(self):
-    #     pass
-        # self.display_paper_type()
-
+class MainScript:
     def db_connect(self):
         conn = connector.connect(
             host='localhost',
@@ -42,10 +38,28 @@ class Main_Script:
             conn = self.db_connect()
             query = f"SELECT beg_no_pages from tbl_inventory WHERE id_paper = {paper_index+1}"
             result = self.execute_query(conn, query).fetchone()
+            if result == None:
+                return "0"
             conn.close()
 
             return result
-            # print(result)
         except Error as e:
             print(e)
+
+    def show_print_price(self, index, type):
+        try:
+            conn = self.db_connect()
+            query = f"SELECT price from tbl_print_cost WHERE id_paper = {index+1} AND print_type = '{type}'"
+            result = self.execute_query(conn, query).fetchone()
+            if result == None:
+                return "0.00"
+            conn.close()
+
+            return result
+        except Error as e:
+            print(e)
+
+    def calculate(self, price, no_pages):
+        print(price*no_pages)
+        return price * no_pages
 

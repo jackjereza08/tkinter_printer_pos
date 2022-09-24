@@ -2,15 +2,16 @@
 from tkinter import *
 from tkinter import font
 from tkinter.ttk import *
-from main_script import Main_Script
+from main_script import MainScript
 
 
 FONT_STYLE = ("", 12)
 FONT_STYLE_ENTRY = ("", 14)
-DB_CONNECTION = Main_Script()
+
 
 class Main:
     def __init__(self):
+        self.script = MainScript()
         self.root = Tk()
         self.init_variables()
         self.configure()
@@ -21,6 +22,10 @@ class Main:
 
     def init_variables(self):
         self.paper_type_index_var = StringVar()
+        self.print_type_var = StringVar()
+        self.price_no_var = IntVar()
+        self.no_pages_printed_var = IntVar()
+        self.amount_var = IntVar()
 
     def configure(self):
         style = Style()
@@ -40,21 +45,21 @@ class Main:
         lbl_paper_type = Label(div,text="Paper Type", font=FONT_STYLE)
         paper_type_var = StringVar()
         cmb_paper_type = Combobox(div, textvariable=paper_type_var, style='MyCB.TCombobox')
-        cmb_paper_type['values'] = DB_CONNECTION.display_paper_type()
+        cmb_paper_type['values'] = self.script.display_paper_type()
         cmb_paper_type.state(['readonly'])
         cmb_paper_type.bind('<<ComboboxSelected>>', combobox_selected)
 
         div.grid(row=0, column=0, sticky=W, padx=10, pady=10)
         lbl_paper_type.grid(sticky=W)
         cmb_paper_type.grid(pady=5)
-
-        def rb_selection():
-            print(f"Selected: {print_type_var.get()}")
         
         div = Frame(frame_column0)
-        print_type_var = IntVar()
-        rb_print_colored = Radiobutton(div, text="Colored", variable=print_type_var, value=1, command=rb_selection, style='MyRB.TRadiobutton')
-        rb_print_bw = Radiobutton(div, text="Black and White", variable=print_type_var, value=2, command=rb_selection, style='MyRB.TRadiobutton')
+        
+        def rb_selected():
+            self.select_print_type(cmb_paper_type.current())
+        
+        rb_print_colored = Radiobutton(div, text="Colored", variable=self.print_type_var, value="Colored", command=rb_selected, style='MyRB.TRadiobutton')
+        rb_print_bw = Radiobutton(div, text="Black and White", variable=self.print_type_var, value="BW", command=rb_selected, style='MyRB.TRadiobutton')
         
         div.grid(row=2, column=0, sticky=W, padx=10)
         rb_print_colored.grid(sticky=W)
@@ -63,11 +68,15 @@ class Main:
         div = Frame(frame_column0)
         lbl_pages_printed = Label(div, text="Pages Printed", font=FONT_STYLE)
         tb_pages_printed = Entry(div, font=FONT_STYLE_ENTRY, width=9)
+        tb_pages_printed['textvariable'] = self.no_pages_printed_var
+
+        def entry_returned(event):
+            self.calculate_amount()
         
         div.grid(row=3, column=0, sticky=W, padx=10, pady=10)
         lbl_pages_printed.grid(sticky=W)
         tb_pages_printed.grid(sticky=W, pady=10)
-
+        tb_pages_printed.bind('<Return>', entry_returned)
 
     def column1(self):
         frame_column1 = Frame(self.root)
@@ -78,13 +87,14 @@ class Main:
         lbl_available_no['textvariable'] = self.paper_type_index_var
         self.paper_type_index_var.set("0")
         lbl_price = Label(frame_column1, text="Price", font=FONT_STYLE)
-        lbl_price_no = Label(frame_column1, text="Php 0.00 per pages", font=FONT_STYLE)
+        lbl_price_no = Label(frame_column1, text="0.00", font=FONT_STYLE)
+        lbl_price_no['textvariable'] = self.price_no_var
+        self.price_no_var.set("0.00")
         
         lbl_available.pack(anchor=W)
         lbl_available_no.pack(anchor=E)
         lbl_price.pack(anchor=W)
         lbl_price_no.pack(anchor=W)
-
     
     def column2(self):
         frame_column2 = Frame(self.root)
@@ -95,6 +105,8 @@ class Main:
         lbl_amount = Label(div, text="Amount", font=FONT_STYLE)
 
         lbl_amount_value = Label(div, text="0.00", font=("",30), anchor=E, width=8, background='#FFFFFF', relief=SOLID)
+        lbl_amount_value['textvariable'] = self.amount_var
+        lbl_amount_value['text'] = "0.00"
         lbl_php = Label(div, text="PHP", font=("",30))
         
         div.grid(row=0, column=0, columnspan=3, sticky=NSEW)
@@ -127,10 +139,16 @@ class Main:
         btn_save_transaction = Button(div, text="Save Transaction", style='MyBTN.TButton')
         btn_save_transaction.grid(row=3, columnspan=3, sticky=NSEW)
 
-
     def paper_selection(self, index):
-        result = DB_CONNECTION.show_available_no_paper(index)
+        result = self.script.show_available_no_paper(index)
         self.paper_type_index_var.set(str(result[0]))
 
+    def select_print_type(self, index):
+        result = self.script.show_print_price(index, self.print_type_var.get())
+        self.price_no_var.set(f"{result[0]}")
+
+    def calculate_amount(self):
+        result = self.script.calculate(self.price_no_var.get(), self.no_pages_printed_var.get())
+        self.amount_var.set(f"{str(result)}.00")
 
 Main()
