@@ -1,4 +1,5 @@
 #POS System by jackjrz
+from msilib import type_binary
 from tkinter import *
 from tkinter import font
 from tkinter.ttk import *
@@ -26,6 +27,9 @@ class Main:
         self.price_no_var = IntVar()
         self.no_pages_printed_var = IntVar()
         self.amount_var = IntVar()
+        self.exact_cash_var = IntVar()
+        self.cash_value_var = IntVar()
+        self.change_value_var = IntVar()
 
     def configure(self):
         style = Style()
@@ -69,6 +73,7 @@ class Main:
         lbl_pages_printed = Label(div, text="Pages Printed", font=FONT_STYLE)
         tb_pages_printed = Entry(div, font=FONT_STYLE_ENTRY, width=9)
         tb_pages_printed['textvariable'] = self.no_pages_printed_var
+        self.no_pages_printed_var.set("")
 
         def entry_returned(event):
             self.calculate_amount()
@@ -116,17 +121,25 @@ class Main:
 
         div = Frame(frame_column2)
         div.grid(row=1, column=0, columnspan=3, sticky=NSEW)
-        exact_cash_var = IntVar()
+
+        def check_exact_cash(event):
+            self.check_exact_cash()
 
         lbl_payment = Label(div, text="Payment", font=FONT_STYLE)
-        chk_exact_cash = Checkbutton(div, variable=exact_cash_var, text="Exact Cash", style='MyCH.TCheckbutton')
+        chk_exact_cash = Checkbutton(div, variable=self.exact_cash_var, text="Exact Cash", style='MyCH.TCheckbutton')
+        chk_exact_cash.bind('<Button-1>', check_exact_cash)
         tb_cash_value = Entry(div, font=FONT_STYLE_ENTRY, width=8, justify=RIGHT)
         lbl_php = Label(div, text="PHP", font=FONT_STYLE_ENTRY)
+
+        def change_change_value(event):
+            self.set_change()
 
         lbl_payment.grid(row=0, column=0, sticky=W)
         chk_exact_cash.grid(row=1, column=0)
         tb_cash_value.grid(row=1, column=1, sticky=E)
         lbl_php.grid(row=1, column=2, sticky=E)
+        tb_cash_value['textvariable'] = self.cash_value_var
+        tb_cash_value.bind('<Return>', change_change_value)
 
         lbl_change = Label(div, text="Change", font=FONT_STYLE)
         lbl_change_value = Label(div, text="0.00",font=FONT_STYLE)
@@ -135,10 +148,12 @@ class Main:
         lbl_change.grid(row=2, column=0)
         lbl_change_value.grid(row=2, column=1, sticky=E, ipadx=5, ipady=5)
         lbl_php.grid(row=2, column=2)
+        lbl_change_value['textvariable'] = self.change_value_var
 
         btn_save_transaction = Button(div, text="Save Transaction", style='MyBTN.TButton')
         btn_save_transaction.grid(row=3, columnspan=3, sticky=NSEW)
 
+    # Methods to call scripts
     def paper_selection(self, index):
         result = self.script.show_available_no_paper(index)
         self.paper_type_index_var.set(str(result[0]))
@@ -150,5 +165,15 @@ class Main:
     def calculate_amount(self):
         result = self.script.calculate(self.price_no_var.get(), self.no_pages_printed_var.get())
         self.amount_var.set(f"{str(result)}.00")
+
+    def check_exact_cash(self):
+        is_exact = self.exact_cash_var.get()
+        if is_exact == 0:
+            self.cash_value_var.set(self.amount_var.get())
+        else:
+            self.cash_value_var.set(0)
+
+    def set_change(self):
+        self.change_value_var.set(self.cash_value_var.get() - self.amount_var.get())
 
 Main()

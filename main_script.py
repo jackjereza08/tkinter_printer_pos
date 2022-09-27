@@ -60,6 +60,5 @@ class MainScript:
             print(e)
 
     def calculate(self, price, no_pages):
-        print(price*no_pages)
         return price * no_pages
 
