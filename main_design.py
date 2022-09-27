@@ -22,7 +22,8 @@ class Main:
         self.root.mainloop()
 
     def init_variables(self):
-        self.paper_type_index_var = StringVar()
+        self.paper_type_index_var = IntVar()
+        self.paper_available_var = StringVar()
         self.print_type_var = StringVar()
         self.price_no_var = IntVar()
         self.no_pages_printed_var = IntVar()
@@ -44,6 +45,7 @@ class Main:
 
         def combobox_selected(event):
             self.paper_selection(cmb_paper_type.current())
+            self.paper_type_index_var.set(cmb_paper_type.current())
         
         div = Frame(frame_column0)
         lbl_paper_type = Label(div,text="Paper Type", font=FONT_STYLE)
@@ -89,8 +91,8 @@ class Main:
 
         lbl_available = Label(frame_column1, text="Available Paper", font=FONT_STYLE)
         lbl_available_no = Label(frame_column1, text="0", font=FONT_STYLE)
-        lbl_available_no['textvariable'] = self.paper_type_index_var
-        self.paper_type_index_var.set("0")
+        lbl_available_no['textvariable'] = self.paper_available_var
+        self.paper_available_var.set("0")
         lbl_price = Label(frame_column1, text="Price", font=FONT_STYLE)
         lbl_price_no = Label(frame_column1, text="0.00", font=FONT_STYLE)
         lbl_price_no['textvariable'] = self.price_no_var
@@ -150,13 +152,16 @@ class Main:
         lbl_php.grid(row=2, column=2)
         lbl_change_value['textvariable'] = self.change_value_var
 
-        btn_save_transaction = Button(div, text="Save Transaction", style='MyBTN.TButton')
+        def save_transaction():
+            self.save_transaction()
+
+        btn_save_transaction = Button(div, text="Save Transaction", style='MyBTN.TButton', command=save_transaction)
         btn_save_transaction.grid(row=3, columnspan=3, sticky=NSEW)
 
     # Methods to call scripts
     def paper_selection(self, index):
         result = self.script.show_available_no_paper(index)
-        self.paper_type_index_var.set(str(result[0]))
+        self.paper_available_var.set(str(result[0]))
 
     def select_print_type(self, index):
         result = self.script.show_print_price(index, self.print_type_var.get())
@@ -175,5 +180,13 @@ class Main:
 
     def set_change(self):
         self.change_value_var.set(self.cash_value_var.get() - self.amount_var.get())
+
+    def save_transaction(self):
+        self.script.save_transaction(
+            id_paper=self.paper_type_index_var.get()+1,
+            print_type=self.print_type_var.get(),
+            print_price=self.price_no_var.get(),
+            print_no_page=self.no_pages_printed_var.get()
+        )
 
 Main()
