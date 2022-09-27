@@ -1,7 +1,7 @@
 from getpass import getpass
 import mysql.connector as connector
 from mysql.connector import Error
-from datetime import datetime
+from datetime import datetime, date
 
 
 class MainScript:
@@ -64,24 +64,20 @@ class MainScript:
         return price * no_pages
 
     def save_transaction(self, id_paper, print_type, print_price, print_no_page):
-        print(str(datetime.now().fromisoformat()))
-        # try:
-        #     conn = self.db_connect()
-        #     query = f"""
-        #             INSERT INTO tbl_print(id_paper,print_type,print_price,print_no_page,print_date)
-        #             VALUES
-        #             ({id_paper},{print_type},{print_price},{print_no_page},{datetime.now().date()});
-        #             """
-        #     result = self.execute_query(conn, query)
-        #     conn.close()
+        print_date = datetime.now()
+        
+        try:
+            conn = self.db_connect()
+            query = f"""
+                    INSERT INTO tbl_print(id_paper,print_type,print_price,print_no_page,print_date)
+                    VALUES
+                    ({id_paper},"{print_type}",{print_price},{print_no_page},'{print_date.date()}');
+                    """
+            result = self.execute_query(conn, query)
+            conn.commit()
+            conn.close()
 
-        #     return result
-        # except Error as e:
-        #     print(e)
+            print(result.rowcount)
+        except Error as e:
+            print(e)
 
-
-
-def test():
-    print(str(datetime.now()))
-
-test()

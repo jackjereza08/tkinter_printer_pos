@@ -181,7 +181,7 @@ class Main:
     def set_change(self):
         self.change_value_var.set(self.cash_value_var.get() - self.amount_var.get())
 
-    def save_transaction(self):
+    def save_transaction(self): 
         self.script.save_transaction(
             id_paper=self.paper_type_index_var.get()+1,
             print_type=self.print_type_var.get(),
