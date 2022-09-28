@@ -16,6 +16,7 @@ class Main:
         self.root = Tk()
         self.init_variables()
         self.configure()
+        self.menu()
         self.column0()
         self.column1()
         self.column2()
@@ -52,6 +53,13 @@ class Main:
         self.root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
         self.root.resizable(False,False)
         self.root.title("Print POS")
+
+    def menu(self):
+        menubar = Menu(self.root)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Transaction")
+        menubar.add_cascade(label="File", menu=filemenu)
+        self.root.config(menu=menubar)
 
     def column0(self):
         frame_column0 = Frame(self.root)
