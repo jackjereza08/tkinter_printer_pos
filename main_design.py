@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import font
 from tkinter.ttk import *
 from main_script import MainScript
+from tkinter import messagebox as mgb
 
 
 FONT_STYLE = ("", 12)
@@ -182,11 +183,16 @@ class Main:
         self.change_value_var.set(self.cash_value_var.get() - self.amount_var.get())
 
     def save_transaction(self): 
-        self.script.save_transaction(
-            id_paper=self.paper_type_index_var.get()+1,
-            print_type=self.print_type_var.get(),
-            print_price=self.price_no_var.get(),
-            print_no_page=self.no_pages_printed_var.get()
-        )
+        result = self.script.save_transaction(
+                    id_paper=self.paper_type_index_var.get()+1,
+                    print_type=self.print_type_var.get(),
+                    print_price=self.price_no_var.get(),
+                    print_no_page=self.no_pages_printed_var.get()
+                )
+        
+        if result == 1:
+            mgb.showinfo(title="Save Transaction", message="Saved Transaction Successfully!")
+        else:
+            mgb.showerror(title="Save Transaction", message="Saved Transaction Failed!")
 
 Main()

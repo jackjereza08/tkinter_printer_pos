@@ -77,7 +77,7 @@ class MainScript:
             conn.commit()
             conn.close()
 
-            print(result.rowcount)
+            return result.rowcount
         except Error as e:
             print(e)
 
