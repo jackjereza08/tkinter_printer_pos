@@ -1,5 +1,4 @@
 #POS System by jackjrz
-from msilib import type_binary
 from tkinter import *
 from tkinter import font
 from tkinter.ttk import *
