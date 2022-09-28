@@ -37,7 +37,7 @@ class MainScript:
     def show_available_no_paper(self, paper_index):
         try:
             conn = self.db_connect()
-            query = f"SELECT beg_no_pages from tbl_inventory WHERE id_paper = {paper_index+1}"
+            query = f"SELECT paper_available from tbl_paper WHERE id_paper = {paper_index+1}"
             result = self.execute_query(conn, query).fetchone()
             if result == None:
                 return "0"
@@ -71,7 +71,7 @@ class MainScript:
             query = f"""
                     INSERT INTO tbl_print(id_paper,print_type,print_price,print_no_page,print_date)
                     VALUES
-                    ({id_paper},"{print_type}",{print_price},{print_no_page},'{print_date.date()}');
+                    ({id_paper},"{print_type}",{print_price},{print_no_page},'{print_date}');
                     """
             result = self.execute_query(conn, query)
             conn.commit()
