@@ -3,7 +3,7 @@ from msilib import type_binary
 from tkinter import *
 from tkinter import font
 from tkinter.ttk import *
-from main_script import MainScript
+from scripts.main_script import MainScript
 from tkinter import messagebox as mgb
 
 
