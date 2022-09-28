@@ -10,7 +10,6 @@ from tkinter import messagebox as mgb
 FONT_STYLE = ("", 12)
 FONT_STYLE_ENTRY = ("", 14)
 
-
 class Main:
     def __init__(self):
         self.script = MainScript()
@@ -40,33 +39,38 @@ class Main:
         style.configure('MyCB.TCombobox', font=FONT_STYLE)
         style.configure('MyBTN.TButton', font=FONT_STYLE, background='#00FF22')
 
+        window_width = 590
+        window_height = 220
+
+        # get the screen dimension
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        # find the center point
+        center_x = int(screen_width/2 - window_width / 2)
+        center_y = int(screen_height/2 - window_height / 2)
+        # set the position of the window to the center of the screen
+        self.root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+        self.root.resizable(False,False)
+        self.root.title("Print POS")
+
     def column0(self):
         frame_column0 = Frame(self.root)
         frame_column0.grid(row=0, column=0)
-
-        def combobox_selected(event):
-            self.paper_selection(cmb_paper_type.current())
-            self.paper_type_index_var.set(cmb_paper_type.current())
         
         div = Frame(frame_column0)
         lbl_paper_type = Label(div,text="Paper Type", font=FONT_STYLE)
-        paper_type_var = StringVar()
-        cmb_paper_type = Combobox(div, textvariable=paper_type_var, style='MyCB.TCombobox')
+        cmb_paper_type = Combobox(div, style='MyCB.TCombobox')
         cmb_paper_type['values'] = self.script.display_paper_type()
         cmb_paper_type.state(['readonly'])
-        cmb_paper_type.bind('<<ComboboxSelected>>', combobox_selected)
+        cmb_paper_type.bind('<<ComboboxSelected>>', lambda e:self.paper_selection(cmb_paper_type.current()))
 
         div.grid(row=0, column=0, sticky=W, padx=10, pady=10)
         lbl_paper_type.grid(sticky=W)
         cmb_paper_type.grid(pady=5)
         
         div = Frame(frame_column0)
-        
-        def rb_selected():
-            self.select_print_type(cmb_paper_type.current())
-        
-        rb_print_colored = Radiobutton(div, text="Colored", variable=self.print_type_var, value="Colored", command=rb_selected, style='MyRB.TRadiobutton')
-        rb_print_bw = Radiobutton(div, text="Black and White", variable=self.print_type_var, value="BW", command=rb_selected, style='MyRB.TRadiobutton')
+        rb_print_colored = Radiobutton(div, text="Colored", variable=self.print_type_var, value="Colored", command=lambda: self.select_print_type(cmb_paper_type.current()), style='MyRB.TRadiobutton')
+        rb_print_bw = Radiobutton(div, text="Black and White", variable=self.print_type_var, value="BW", command=lambda: self.select_print_type(cmb_paper_type.current()), style='MyRB.TRadiobutton')
         
         div.grid(row=2, column=0, sticky=W, padx=10)
         rb_print_colored.grid(sticky=W)
@@ -78,13 +82,10 @@ class Main:
         tb_pages_printed['textvariable'] = self.no_pages_printed_var
         self.no_pages_printed_var.set("")
 
-        def entry_returned(event):
-            self.calculate_amount()
-        
         div.grid(row=3, column=0, sticky=W, padx=10, pady=10)
         lbl_pages_printed.grid(sticky=W)
         tb_pages_printed.grid(sticky=W, pady=10)
-        tb_pages_printed.bind('<Return>', entry_returned)
+        tb_pages_printed.bind('<Return>', lambda e:self.calculate_amount())
 
     def column1(self):
         frame_column1 = Frame(self.root)
@@ -102,7 +103,7 @@ class Main:
         lbl_available.pack(anchor=W)
         lbl_available_no.pack(anchor=E)
         lbl_price.pack(anchor=W)
-        lbl_price_no.pack(anchor=W)
+        lbl_price_no.pack(anchor=E)
     
     def column2(self):
         frame_column2 = Frame(self.root)
@@ -111,7 +112,6 @@ class Main:
         div = Frame(frame_column2)
 
         lbl_amount = Label(div, text="Amount", font=FONT_STYLE)
-
         lbl_amount_value = Label(div, text="0.00", font=("",30), anchor=E, width=8, background='#FFFFFF', relief=SOLID)
         lbl_amount_value['textvariable'] = self.amount_var
         lbl_amount_value['text'] = "0.00"
@@ -125,24 +125,18 @@ class Main:
         div = Frame(frame_column2)
         div.grid(row=1, column=0, columnspan=3, sticky=NSEW)
 
-        def check_exact_cash(event):
-            self.check_exact_cash()
-
         lbl_payment = Label(div, text="Payment", font=FONT_STYLE)
         chk_exact_cash = Checkbutton(div, variable=self.exact_cash_var, text="Exact Cash", style='MyCH.TCheckbutton')
-        chk_exact_cash.bind('<Button-1>', check_exact_cash)
+        chk_exact_cash.bind('<Button-1>', lambda e:self.check_exact_cash())
         tb_cash_value = Entry(div, font=FONT_STYLE_ENTRY, width=8, justify=RIGHT)
         lbl_php = Label(div, text="PHP", font=FONT_STYLE_ENTRY)
-
-        def change_change_value(event):
-            self.set_change()
 
         lbl_payment.grid(row=0, column=0, sticky=W)
         chk_exact_cash.grid(row=1, column=0)
         tb_cash_value.grid(row=1, column=1, sticky=E)
         lbl_php.grid(row=1, column=2, sticky=E)
         tb_cash_value['textvariable'] = self.cash_value_var
-        tb_cash_value.bind('<Return>', change_change_value)
+        tb_cash_value.bind('<Return>', lambda e:self.set_change())
 
         lbl_change = Label(div, text="Change", font=FONT_STYLE)
         lbl_change_value = Label(div, text="0.00",font=FONT_STYLE)
@@ -153,16 +147,14 @@ class Main:
         lbl_php.grid(row=2, column=2)
         lbl_change_value['textvariable'] = self.change_value_var
 
-        def save_transaction():
-            self.save_transaction()
-
-        btn_save_transaction = Button(div, text="Save Transaction", style='MyBTN.TButton', command=save_transaction)
+        btn_save_transaction = Button(div, text="Save Transaction", style='MyBTN.TButton', command=lambda: self.save_transaction())
         btn_save_transaction.grid(row=3, columnspan=3, sticky=NSEW)
 
     # Methods to call scripts
     def paper_selection(self, index):
         result = self.script.show_available_no_paper(index)
         self.paper_available_var.set(str(result[0]))
+        self.paper_type_index_var.set(index)
 
     def select_print_type(self, index):
         result = self.script.show_print_price(index, self.print_type_var.get())
