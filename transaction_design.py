@@ -1,6 +1,7 @@
 from tkinter import *
 # from tkinter import font
 from tkinter.ttk import *
+from scripts.transaction_script import TransactionSum
 # from tkinter import messagebox as mgb
 
 HEADER_FONT = ("", 14, "bold")
@@ -54,5 +55,6 @@ class Transaction:
             l = Label(frame, text=datum, font = FONT_STYLE)
             l.grid(row=2, column=x)
             x+=1
+
 
 Transaction()

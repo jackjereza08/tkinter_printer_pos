@@ -1,29 +1,15 @@
-from getpass import getpass
-import mysql.connector as connector
+from scripts.db_script import MySQLConnector
 from mysql.connector import Error
-from datetime import datetime, date
+from datetime import datetime
 
+db = MySQLConnector()
 
 class MainScript:
-    def db_connect(self):
-        conn = connector.connect(
-            host='localhost',
-            user= 'root',
-            passwd='root',
-            database='db_print_pos')      
-        return conn
-
-    def execute_query(self, conn, query):
-        cursor = conn.cursor()
-        cursor.execute(query)
-        return cursor
-
-
     def display_paper_type(self):
         try:
-            conn = self.db_connect()
+            conn = db.db_connect()
             query = "SELECT * from tbl_paper"
-            result = self.execute_query(conn, query).fetchall()
+            result = db.execute_query(conn, query).fetchall()
             paper_list = []
             for rows in result:
                 paper_list.append(rows[1]+" ("+rows[2]+")")
@@ -36,9 +22,9 @@ class MainScript:
 
     def show_available_no_paper(self, paper_index):
         try:
-            conn = self.db_connect()
+            conn = db.db_connect()
             query = f"SELECT paper_available from tbl_paper WHERE id_paper = {paper_index+1}"
-            result = self.execute_query(conn, query).fetchone()
+            result = db.execute_query(conn, query).fetchone()
             if result == None:
                 return "0"
             conn.close()
@@ -49,9 +35,9 @@ class MainScript:
 
     def show_print_price(self, index, type):
         try:
-            conn = self.db_connect()
+            conn = db.db_connect()
             query = f"SELECT price from tbl_print_cost WHERE id_paper = {index+1} AND print_type = '{type}'"
-            result = self.execute_query(conn, query).fetchone()
+            result = db.execute_query(conn, query).fetchone()
             if result == None:
                 return "0.00"
             conn.close()
@@ -67,18 +53,18 @@ class MainScript:
         print_date = datetime.now()
         
         try:
-            conn = self.db_connect()
+            conn = db.db_connect()
 
             id_print_cost_query = f"""
                         SELECT id_print_cost FROM tbl_print_cost WHERE id_paper = {id_paper} AND print_type = '{print_type}';
                     """
-            id_print_cost = self.execute_query(conn, id_print_cost_query).fetchone()
+            id_print_cost = db.execute_query(conn, id_print_cost_query).fetchone()
             query = f"""
                     INSERT INTO tbl_print(id_print_cost,print_no_page,print_date)
                     VALUES
                     ({id_print_cost[0]},{print_no_page},'{print_date}');
                     """
-            result = self.execute_query(conn, query)
+            result = db.execute_query(conn, query)
             conn.commit()
             conn.close()
 
