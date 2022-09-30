@@ -63,15 +63,20 @@ class MainScript:
     def calculate(self, price, no_pages):
         return price * no_pages
 
-    def save_transaction(self, id_paper, print_type, print_price, print_no_page):
+    def save_transaction(self, id_paper, print_type, print_no_page):
         print_date = datetime.now()
         
         try:
             conn = self.db_connect()
+
+            id_print_cost_query = f"""
+                        SELECT id_print_cost FROM tbl_print_cost WHERE id_paper = {id_paper} AND print_type = '{print_type}';
+                    """
+            id_print_cost = self.execute_query(conn, id_print_cost_query).fetchone()
             query = f"""
-                    INSERT INTO tbl_print(id_paper,print_type,print_price,print_no_page,print_date)
+                    INSERT INTO tbl_print(id_print_cost,print_no_page,print_date)
                     VALUES
-                    ({id_paper},"{print_type}",{print_price},{print_no_page},'{print_date}');
+                    ({id_print_cost[0]},{print_no_page},'{print_date}');
                     """
             result = self.execute_query(conn, query)
             conn.commit()
