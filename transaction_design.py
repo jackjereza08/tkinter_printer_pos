@@ -12,7 +12,10 @@ class Transaction:
     def __init__(self):
         self.root = Tk()
         self.configure()
+        self.frame = Frame(self.root)
+        self.frame.grid()
         self.header()
+        self.content()
         self.root.mainloop()
 
     def configure(self):
@@ -32,28 +35,47 @@ class Transaction:
         self.root.title("Print POS - Transaction Summary")
 
     def header(self):
-        frame = Frame(self.root)
-        frame.grid()
-
-        lbl_price = Label(frame, text="Price", font=HEADER_FONT)
-        lbl_pages_printed = Label(frame, text="Pages Printed", font=HEADER_FONT)
+        lbl_price = Label(self.frame, text="Price", font=HEADER_FONT)
+        lbl_pages_printed = Label(self.frame, text="Pages Printed", font=HEADER_FONT)
         lbl_price.grid(row=0, column=2, columnspan=2, sticky=W, padx =5)
         lbl_pages_printed.grid(row=0, column=4, columnspan=2, sticky=W, padx =5)
 
-        labels = ("Paper Type", "Cost", "BW", "Colored", "BW", "Colored", "Full Sales", "Less Shared", "Total Sales", "Net Profit")
+        labels = ("Paper Type", "Cost", "Colored", "BW", "Colored", "BW", "Full Sales", "Less Shared", "Total Sales", "Net Profit")
 
         x = 0
         for label in labels:
-            l = Label(frame, text=label, font=HEADER_FONT)
+            l = Label(self.frame, text=label, font=HEADER_FONT)
             l.grid(row=1, column=x, padx=5)
             x+=1
 
-        data = ("Short","0.75", "3.00", "5.00")
+    def content(self):
+        tran_sum = TransactionSum()
 
-        x=0
-        for datum in data:
-            l = Label(frame, text=datum, font = FONT_STYLE)
-            l.grid(row=2, column=x)
+        paper_type_list = tran_sum.display_paper_type_all()
+        id_paper_list = tran_sum.get_paper_id()
+        cost_list = tran_sum.display_cost_all()
+
+        # Display Paper Type
+        x=2
+        for paper_type in paper_type_list:
+            l = Label(self.frame, text=paper_type, font = FONT_STYLE)
+            l.grid(row=x, column=0, padx=5, sticky=NSEW)
+            x+=1
+        # Display Cost
+        x=2
+        for cost in cost_list:
+            l = Label(self.frame, text=cost, font = FONT_STYLE)
+            l.grid(row=x, column=1, padx=5, sticky=NSEW)
+            x+=1
+        # Diplay Price
+        x=2
+        index = 2
+        for id in id_paper_list:
+            price = tran_sum.display_price_all(id)
+            for p in price:
+                l = Label(self.frame, text=p, borderwidth=1, relief=SOLID, font = FONT_STYLE)
+                l.grid(row=x, column=index, padx=5, sticky=NSEW)
+                index+=1
             x+=1
 
 
