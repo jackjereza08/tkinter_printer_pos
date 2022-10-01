@@ -1,4 +1,4 @@
-from scripts.db_script import MySQLConnector
+from db_script import MySQLConnector
 from mysql.connector import Error
 from datetime import datetime
 
