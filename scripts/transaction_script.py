@@ -1,17 +1,31 @@
-from db_script import MySQLConnector
+from scripts.db_script import MySQLConnector
 from mysql.connector import Error
-from main_script import MainScript
+from scripts.main_script import MainScript
 
 db = MySQLConnector()
 ms = MainScript()
 
 class TransactionSum:
-    def sales_summary_all(self):
+    def display_paper_type_all(self):
         lists = ms.display_paper_type()
-        print(lists)
-        self.display_cost_all()
-        self.display_price_all(1)
-        self.display_pages_printed_all(1)
+        return lists
+
+    def get_paper_id(self):
+        try:
+            conn = db.db_connect()
+            query = "SELECT id_paper FROM tbl_paper;"
+            result = db.execute_query(conn, query).fetchall()
+            lists = []
+            for res in result:
+                lists.append(res[0])
+            conn.close()
+            return lists
+        except Error as e:
+            print(e)
+    # def sales_summary_all(self):
+    #     lists = ms.display_paper_type()
+    #     print(lists)
+    #     self.display_cost_all()
 
     def display_cost_all(self):
         try:
@@ -22,7 +36,7 @@ class TransactionSum:
             for res in result:
                 lists.append(res[0])
             conn.close()
-            print(lists)
+            return lists
         except Error as e:
             print(e)
 
@@ -35,7 +49,7 @@ class TransactionSum:
             for res in result:
                 lists.append(res[0])
             conn.close()
-            print(lists)
+            return lists
         except Error as e:
             print(e)
 
@@ -48,8 +62,6 @@ class TransactionSum:
             for res in result:
                 lists.append(res[0])
             conn.close()
-            print(lists)
+            return lists
         except Error as e:
             print(e)
-
-TransactionSum().sales_summary_all()
