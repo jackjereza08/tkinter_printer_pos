@@ -2,6 +2,7 @@ from tkinter import *
 # from tkinter import font
 from tkinter.ttk import *
 from scripts.transaction_script import TransactionSum
+
 # from tkinter import messagebox as mgb
 
 HEADER_FONT = ("", 14, "bold")
@@ -14,6 +15,7 @@ class Transaction:
         self.configure()
         self.frame = Frame(self.root)
         self.frame.grid()
+        self.menu()
         self.header()
         self.content()
         self.root.mainloop()
@@ -33,6 +35,18 @@ class Transaction:
         self.root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
         self.root.resizable(False,False)
         self.root.title("Print POS - Transaction Summary")
+    
+    def show_main(self):
+        print("Main!")
+        # md.Main()
+
+    def menu(self):
+        menubar = Menu(self.root)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Main", command=lambda: self.show_main())
+        menubar.add_cascade(label="File", menu=filemenu)
+        self.root.config(menu=menubar)
+
 
     def header(self):
         lbl_price = Label(self.frame, text="Price", font=HEADER_FONT)
@@ -53,7 +67,8 @@ class Transaction:
 
         paper_type_list = tran_sum.display_paper_type_all()
         id_paper_list = tran_sum.get_paper_id()
-        cost_list = tran_sum.display_cost_all()
+        price_lists = []
+        pages_lists = []
 
         # Display Paper Type
         x=2
@@ -63,20 +78,72 @@ class Transaction:
             x+=1
         # Display Cost
         x=2
-        for cost in cost_list:
+        for id in id_paper_list:
+            cost = tran_sum.display_cost_all(id)
             l = Label(self.frame, text=cost, font = FONT_STYLE)
             l.grid(row=x, column=1, padx=5, sticky=NSEW)
             x+=1
         # Diplay Price
         x=2
-        index = 2
         for id in id_paper_list:
-            price = tran_sum.display_price_all(id)
-            for p in price:
-                l = Label(self.frame, text=p, borderwidth=1, relief=SOLID, font = FONT_STYLE)
-                l.grid(row=x, column=index, padx=5, sticky=NSEW)
-                index+=1
-            x+=1
+            index = 2
+            price_colored = tran_sum.display_price_all(id, 'Colored')
+            price_bw = tran_sum.display_price_all(id, 'BW')
+            if len(price_colored) == 0:
+                price_lists.append(0)
+            else:
+                for p in price_colored:
+                    l = Label(self.frame, text=p, borderwidth=1, relief=SOLID, font = FONT_STYLE)
+                    price_lists.append(l['text'])
+                    l.grid(row=x, column=index, padx=5, sticky=NSEW)
 
+            if len(price_bw) == 0:
+                price_lists.append(0)
+            else:
+                for p in price_bw:
+                    l = Label(self.frame, text=p, borderwidth=1, relief=SOLID, font = FONT_STYLE)
+                    price_lists.append(l['text'])
+                    l.grid(row=x, column=index+1, padx=5, sticky=NSEW)
+            x+=1
+        # Display Pages Printed
+        x=2
+        for id in id_paper_list:
+            index = 4
+            printed_colored = tran_sum.display_pages_printed_all(id, 'Colored')
+            printed_bw = tran_sum.display_pages_printed_all(id, 'BW')
+            if len(printed_colored) == 0:
+                pages_lists.append(0)
+            else:
+                for p in printed_colored:
+                    l = Label(self.frame, text=p, borderwidth=1, relief=SOLID, font = FONT_STYLE)
+                    pages_lists.append(l['text'])
+                    l.grid(row=x, column=index, padx=5, sticky=NSEW)
+
+            if len(printed_bw) == 0:
+                pages_lists.append(0)
+            else:
+                for p in printed_bw:
+                    l = Label(self.frame, text=p, borderwidth=1, relief=SOLID, font = FONT_STYLE)
+                    pages_lists.append(l['text'])
+                    l.grid(row=x, column=index+1, padx=5, sticky=NSEW)
+            x+=1
+        # Display Full Sales
+        index = 6
+        x=2
+        sales = []
+        
+        for c in range(len(price_lists)):
+            total = price_lists[c]*pages_lists[c]
+            sales.append(total)
+
+        full_sales = []
+        for c in range(len(sales)):
+            if c%2 == 1:
+                full_sales.append(sales[c]+sales[c-1])
+        
+        for sales in full_sales:
+            l = Label(self.frame, text=sales, borderwidth=1, relief=SOLID, font = FONT_STYLE)
+            l.grid(row=x, column=index, padx=5, sticky=NSEW)
+            x+=1
 
 Transaction()
